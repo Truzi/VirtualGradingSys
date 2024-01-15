@@ -1,4 +1,4 @@
-﻿@model IEnumerable<VirtualGradingSystem.Models.Class>
+﻿@model IEnumerable<VirtualGradingSys.Models.Class>
 
 @{
     ViewData["Title"] = "Index";
@@ -19,7 +19,7 @@
                 @Html.DisplayNameFor(model => model.Letter)
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.HomeroomTeacherId)
+                @Html.DisplayNameFor(model => model.TeacherId)
             </th>
             <th></th>
         </tr>
@@ -34,7 +34,9 @@
                 @Html.DisplayFor(modelItem => item.Letter)
             </td>
             <td>
-                @Html.DisplayFor(modelItem => item.HomeroomTeacherId)
+                @if(item.Teacher != null) {
+                    @Html.DisplayFor(modelItem => item.Teacher.FullName)
+                }
             </td>
             <td>
                 <a asp-action="Edit" asp-route-id="@item.Id">Edit</a> |
