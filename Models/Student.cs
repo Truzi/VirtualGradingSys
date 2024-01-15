@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations.Schema;
 
-namespace VirtualGradingSystem.Models
+namespace VirtualGradingSys.Models
 {
     public class Student
     {
@@ -8,7 +9,9 @@ namespace VirtualGradingSystem.Models
         public int Id { get; set; }
         public string FirstName { get; set; }
         public string LastName { get; set; }
+        [ForeignKey("Class")]
         public int ClassId { get; set; }
+        [ForeignKey("Parent")]
         public int ParentId { get; set; }
         public string FullName => $"{FirstName} {LastName}";
 

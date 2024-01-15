@@ -1,6 +1,8 @@
-﻿using System.Collections.Generic;
+﻿using Microsoft.EntityFrameworkCore.Metadata.Internal;
+using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations.Schema;
 
-namespace VirtualGradingSystem.Models
+namespace VirtualGradingSys.Models
 {
     public class Class
     {
@@ -8,12 +10,13 @@ namespace VirtualGradingSystem.Models
         public int Id { get; set; }
         public string Year { get; set; }
         public char Letter { get; set; }
-        public int HomeroomTeacherId { get; set; }
+        [ForeignKey("Teacher")]
+        public int TeacherId { get; set; }
         public string ClassName => $"{Year} {Letter}";
 
         // EF relations
-        public virtual Teacher? Teacher { get; set; }
+        public Teacher? Teacher { get; set; }
         public virtual ICollection<Student>? Students { get; set; }
-        public virtual ICollection<ClassSubjects>? ClassSubjects { get; set; }   
+        public virtual ICollection<ClassSubjects>? ClassSubjects { get; set; }
     }
 }
