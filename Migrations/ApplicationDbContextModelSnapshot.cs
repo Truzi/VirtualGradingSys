@@ -8,7 +8,7 @@ using VirtualGradingSys.Data;
 
 #nullable disable
 
-namespace VirtualGradingSys.Data.Migrations
+namespace VirtualGradingSys.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
     partial class ApplicationDbContextModelSnapshot : ModelSnapshot
@@ -224,7 +224,7 @@ namespace VirtualGradingSys.Data.Migrations
                     b.ToTable("AspNetUserTokens", (string)null);
                 });
 
-            modelBuilder.Entity("VirtualGradingSystem.Models.Class", b =>
+            modelBuilder.Entity("VirtualGradingSys.Models.Class", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -232,12 +232,12 @@ namespace VirtualGradingSys.Data.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<int>("HomeroomTeacherId")
-                        .HasColumnType("int");
-
                     b.Property<string>("Letter")
                         .IsRequired()
                         .HasColumnType("nvarchar(1)");
+
+                    b.Property<int>("TeacherId")
+                        .HasColumnType("int");
 
                     b.Property<string>("Year")
                         .IsRequired()
@@ -245,10 +245,13 @@ namespace VirtualGradingSys.Data.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("TeacherId")
+                        .IsUnique();
+
                     b.ToTable("Classes");
                 });
 
-            modelBuilder.Entity("VirtualGradingSystem.Models.ClassSubjects", b =>
+            modelBuilder.Entity("VirtualGradingSys.Models.ClassSubjects", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -271,7 +274,7 @@ namespace VirtualGradingSys.Data.Migrations
                     b.ToTable("ClassSubjects");
                 });
 
-            modelBuilder.Entity("VirtualGradingSystem.Models.Grade", b =>
+            modelBuilder.Entity("VirtualGradingSys.Models.Grade", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -301,7 +304,7 @@ namespace VirtualGradingSys.Data.Migrations
                     b.ToTable("Grades");
                 });
 
-            modelBuilder.Entity("VirtualGradingSystem.Models.Parent", b =>
+            modelBuilder.Entity("VirtualGradingSys.Models.Parent", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -322,7 +325,7 @@ namespace VirtualGradingSys.Data.Migrations
                     b.ToTable("Parents");
                 });
 
-            modelBuilder.Entity("VirtualGradingSystem.Models.Student", b =>
+            modelBuilder.Entity("VirtualGradingSys.Models.Student", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -353,7 +356,7 @@ namespace VirtualGradingSys.Data.Migrations
                     b.ToTable("Students");
                 });
 
-            modelBuilder.Entity("VirtualGradingSystem.Models.Subject", b =>
+            modelBuilder.Entity("VirtualGradingSys.Models.Subject", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -375,16 +378,13 @@ namespace VirtualGradingSys.Data.Migrations
                     b.ToTable("Subjects");
                 });
 
-            modelBuilder.Entity("VirtualGradingSystem.Models.Teacher", b =>
+            modelBuilder.Entity("VirtualGradingSys.Models.Teacher", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<int?>("ClassId")
-                        .HasColumnType("int");
 
                     b.Property<string>("FirstName")
                         .IsRequired()
@@ -395,10 +395,6 @@ namespace VirtualGradingSys.Data.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("ClassId")
-                        .IsUnique()
-                        .HasFilter("[ClassId] IS NOT NULL");
 
                     b.ToTable("Teachers");
                 });
@@ -454,18 +450,29 @@ namespace VirtualGradingSys.Data.Migrations
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("VirtualGradingSystem.Models.ClassSubjects", b =>
+            modelBuilder.Entity("VirtualGradingSys.Models.Class", b =>
                 {
-                    b.HasOne("VirtualGradingSystem.Models.Class", "Class")
+                    b.HasOne("VirtualGradingSys.Models.Teacher", "Teacher")
+                        .WithOne("Class")
+                        .HasForeignKey("VirtualGradingSys.Models.Class", "TeacherId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Teacher");
+                });
+
+            modelBuilder.Entity("VirtualGradingSys.Models.ClassSubjects", b =>
+                {
+                    b.HasOne("VirtualGradingSys.Models.Class", "Class")
                         .WithMany("ClassSubjects")
                         .HasForeignKey("ClassId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("VirtualGradingSystem.Models.Subject", "Subject")
+                    b.HasOne("VirtualGradingSys.Models.Subject", "Subject")
                         .WithMany("ClassSubjects")
                         .HasForeignKey("SubjectId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.Navigation("Class");
@@ -473,18 +480,18 @@ namespace VirtualGradingSys.Data.Migrations
                     b.Navigation("Subject");
                 });
 
-            modelBuilder.Entity("VirtualGradingSystem.Models.Grade", b =>
+            modelBuilder.Entity("VirtualGradingSys.Models.Grade", b =>
                 {
-                    b.HasOne("VirtualGradingSystem.Models.Student", "Student")
+                    b.HasOne("VirtualGradingSys.Models.Student", "Student")
                         .WithMany("Grades")
                         .HasForeignKey("StudentId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("VirtualGradingSystem.Models.Subject", "Subject")
+                    b.HasOne("VirtualGradingSys.Models.Subject", "Subject")
                         .WithMany("Grades")
                         .HasForeignKey("SubjectId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.Navigation("Student");
@@ -492,15 +499,15 @@ namespace VirtualGradingSys.Data.Migrations
                     b.Navigation("Subject");
                 });
 
-            modelBuilder.Entity("VirtualGradingSystem.Models.Student", b =>
+            modelBuilder.Entity("VirtualGradingSys.Models.Student", b =>
                 {
-                    b.HasOne("VirtualGradingSystem.Models.Class", "Class")
+                    b.HasOne("VirtualGradingSys.Models.Class", "Class")
                         .WithMany("Students")
                         .HasForeignKey("ClassId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("VirtualGradingSystem.Models.Parent", "Parent")
+                    b.HasOne("VirtualGradingSys.Models.Parent", "Parent")
                         .WithMany("Student")
                         .HasForeignKey("ParentId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -511,9 +518,9 @@ namespace VirtualGradingSys.Data.Migrations
                     b.Navigation("Parent");
                 });
 
-            modelBuilder.Entity("VirtualGradingSystem.Models.Subject", b =>
+            modelBuilder.Entity("VirtualGradingSys.Models.Subject", b =>
                 {
-                    b.HasOne("VirtualGradingSystem.Models.Teacher", "Teacher")
+                    b.HasOne("VirtualGradingSys.Models.Teacher", "Teacher")
                         .WithMany("Subject")
                         .HasForeignKey("TeacherId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -522,43 +529,34 @@ namespace VirtualGradingSys.Data.Migrations
                     b.Navigation("Teacher");
                 });
 
-            modelBuilder.Entity("VirtualGradingSystem.Models.Teacher", b =>
-                {
-                    b.HasOne("VirtualGradingSystem.Models.Class", "Class")
-                        .WithOne("Teacher")
-                        .HasForeignKey("VirtualGradingSystem.Models.Teacher", "ClassId");
-
-                    b.Navigation("Class");
-                });
-
-            modelBuilder.Entity("VirtualGradingSystem.Models.Class", b =>
+            modelBuilder.Entity("VirtualGradingSys.Models.Class", b =>
                 {
                     b.Navigation("ClassSubjects");
 
                     b.Navigation("Students");
-
-                    b.Navigation("Teacher");
                 });
 
-            modelBuilder.Entity("VirtualGradingSystem.Models.Parent", b =>
+            modelBuilder.Entity("VirtualGradingSys.Models.Parent", b =>
                 {
                     b.Navigation("Student");
                 });
 
-            modelBuilder.Entity("VirtualGradingSystem.Models.Student", b =>
+            modelBuilder.Entity("VirtualGradingSys.Models.Student", b =>
                 {
                     b.Navigation("Grades");
                 });
 
-            modelBuilder.Entity("VirtualGradingSystem.Models.Subject", b =>
+            modelBuilder.Entity("VirtualGradingSys.Models.Subject", b =>
                 {
                     b.Navigation("ClassSubjects");
 
                     b.Navigation("Grades");
                 });
 
-            modelBuilder.Entity("VirtualGradingSystem.Models.Teacher", b =>
+            modelBuilder.Entity("VirtualGradingSys.Models.Teacher", b =>
                 {
+                    b.Navigation("Class");
+
                     b.Navigation("Subject");
                 });
 #pragma warning restore 612, 618
