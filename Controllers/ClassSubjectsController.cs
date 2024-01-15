@@ -22,7 +22,11 @@ namespace VirtualGradingSys.Controllers
         // GET: ClassSubjects
         public async Task<IActionResult> Index()
         {
-            var gradingSystemContext = _context.ClassSubjects.Include(c => c.Class).Include(c => c.Subject).OrderBy(c => c.ClassId);
+            var gradingSystemContext = _context.ClassSubjects
+                .Include(c => c.Class)
+                .Include(c => c.Subject)
+                .Include(c => c.Subject.Teacher)
+                .OrderBy(c => c.ClassId);
             return View(await gradingSystemContext.ToListAsync());
         }
 
@@ -37,6 +41,7 @@ namespace VirtualGradingSys.Controllers
             var classSubjects = await _context.ClassSubjects
                 .Include(c => c.Class)
                 .Include(c => c.Subject)
+                .Include(c => c.Subject.Teacher)
                 .FirstOrDefaultAsync(m => m.Id == id);
             if (classSubjects == null)
             {
@@ -138,6 +143,7 @@ namespace VirtualGradingSys.Controllers
             var classSubjects = await _context.ClassSubjects
                 .Include(c => c.Class)
                 .Include(c => c.Subject)
+                .Include(c => c.Subject.Teacher)
                 .FirstOrDefaultAsync(m => m.Id == id);
             if (classSubjects == null)
             {
