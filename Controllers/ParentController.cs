@@ -6,7 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using VirtualGradingSys.Data;
-using VirtualGradingSystem.Models;
+using VirtualGradingSys.Models;
 
 namespace VirtualGradingSys.Controllers
 {

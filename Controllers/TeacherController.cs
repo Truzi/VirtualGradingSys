@@ -6,7 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using VirtualGradingSys.Data;
-using VirtualGradingSystem.Models;
+using VirtualGradingSys.Models;
 
 namespace VirtualGradingSys.Controllers
 {
@@ -65,7 +65,6 @@ namespace VirtualGradingSys.Controllers
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
-            ViewData["ClassId"] = new SelectList(_context.Classes, "Id", "Id", teacher.ClassId);
             return View(teacher);
         }
 
@@ -82,7 +81,6 @@ namespace VirtualGradingSys.Controllers
             {
                 return NotFound();
             }
-            ViewData["ClassId"] = new SelectList(_context.Classes, "Id", "Id", teacher.ClassId);
             return View(teacher);
         }
 
@@ -118,7 +116,6 @@ namespace VirtualGradingSys.Controllers
                 }
                 return RedirectToAction(nameof(Index));
             }
-            ViewData["ClassId"] = new SelectList(_context.Classes, "Id", "Id", teacher.ClassId);
             return View(teacher);
         }
 

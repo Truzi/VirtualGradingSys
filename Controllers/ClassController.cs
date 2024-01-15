@@ -6,7 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using VirtualGradingSys.Data;
-using VirtualGradingSystem.Models;
+using VirtualGradingSys.Models;
 
 namespace VirtualGradingSys.Controllers
 {
@@ -22,7 +22,7 @@ namespace VirtualGradingSys.Controllers
         // GET: Class
         public async Task<IActionResult> Index()
         {
-            return View(await _context.Classes.ToListAsync());
+            return View(await _context.Classes.OrderBy(c => c.Id).Include(c => c.Teacher).ToListAsync());
         }
 
         // GET: Class/Details/5
@@ -46,7 +46,7 @@ namespace VirtualGradingSys.Controllers
         // GET: Class/Create
         public IActionResult Create()
         {
-            ViewData["HomeroomTeacherId"] = new SelectList(_context.Teachers, "Id", "Id");
+            ViewData["TeacherId"] = new SelectList(_context.Teachers.Where(t => t.Class == null), "Id", "FullName");
             return View();
         }
 
@@ -55,8 +55,18 @@ namespace VirtualGradingSys.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Year,Letter,HomeroomTeacherId")] Class @class)
+        public async Task<IActionResult> Create([Bind("Year,Letter,TeacherId")] Class @class)
         {   
+            var homeroomTeacher = _context.Teachers.Where(t => t.Id == @class.TeacherId).Include(t => t.Class).ToList();
+            Console.WriteLine(homeroomTeacher[0]);
+            if(homeroomTeacher.Count != 1)
+            {
+                return BadRequest("Invalid TeacherId");
+            } else
+            {
+                @class.Teacher = homeroomTeacher[0];
+            }
+            if (@class.Teacher != null) Console.WriteLine(@class.Teacher.FullName);
             if (ModelState.IsValid)
             {
                 _context.Add(@class);
@@ -95,7 +105,7 @@ namespace VirtualGradingSys.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,Year,Letter,HomeroomTeacherId")] Class @class)
+        public async Task<IActionResult> Edit(int id, [Bind("Id,Year,Letter,TeacherId")] Class @class)
         {
             if (id != @class.Id)
             {
@@ -122,6 +132,7 @@ namespace VirtualGradingSys.Controllers
                 }
                 return RedirectToAction(nameof(Index));
             }
+            ViewData["TeacherId"] = new SelectList(_context.Teachers, "Id", "FullName", @class.TeacherId);
             return View(@class);
         }
 
