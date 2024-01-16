@@ -2,21 +2,26 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
+using NuGet.DependencyResolver;
 using VirtualGradingSys.Data;
 using VirtualGradingSys.Models;
 
 namespace VirtualGradingSys.Controllers
 {
+    [Authorize(Roles = "Admin")]
     public class StudentController : Controller
     {
         private readonly ApplicationDbContext _context;
-
-        public StudentController(ApplicationDbContext context)
+        private readonly UserManager<IdentityUser> _userManager;
+        public StudentController(ApplicationDbContext context, UserManager<IdentityUser> userManager)
         {
             _context = context;
+            _userManager = userManager;
         }
 
         // GET: Student
@@ -64,8 +69,14 @@ namespace VirtualGradingSys.Controllers
         {
             if (ModelState.IsValid)
             {
+                var user = new IdentityUser();
+
                 _context.Add(student);
                 await _context.SaveChangesAsync();
+                user.Email = student.Email;
+                user.UserName = student.Email;
+                await _userManager.CreateAsync(user, "Passw0rd!");
+                await _userManager.AddToRoleAsync(user, "Student");
                 return RedirectToAction(nameof(Index));
             }
             ViewData["ParentId"] = new SelectList(_context.Parents, "Id", "FullName", student.ParentId);

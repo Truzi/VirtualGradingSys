@@ -59,15 +59,4 @@ using(var scope = app.Services.CreateScope())
     }
 }
 
-using (var scope = app.Services.CreateScope())
-{
-    var userManager =
-        scope.ServiceProvider.GetRequiredService<UserManager<IdentityUser>>();
-    var user = await userManager.FindByEmailAsync("email@example.com");
-    if (user != null)
-    {
-        await userManager.AddToRoleAsync(user, "Student");
-    }
-}
-
 app.Run();

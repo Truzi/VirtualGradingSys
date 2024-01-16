@@ -9,7 +9,7 @@ namespace VirtualGradingSys.Models
         public int Id { get; set; }
         public string FirstName { get; set; }
         public string LastName { get; set; }
-        public string Email { get; set; }
+        public string Email => $"{FirstName.ToLower()}.{LastName.ToLower()}@s.com";
         [ForeignKey("Class")]
         public int ClassId { get; set; }
         [ForeignKey("Parent")]

@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
@@ -10,13 +12,16 @@ using VirtualGradingSys.Models;
 
 namespace VirtualGradingSys.Controllers
 {
+    [Authorize(Roles = "Admin")]
     public class ParentController : Controller
     {
         private readonly ApplicationDbContext _context;
+        private readonly UserManager<IdentityUser> _userManager;
 
-        public ParentController(ApplicationDbContext context)
+        public ParentController(ApplicationDbContext context, UserManager<IdentityUser> userManager)
         {
             _context = context;
+            _userManager = userManager;
         }
 
         // GET: Parent
@@ -58,8 +63,14 @@ namespace VirtualGradingSys.Controllers
         {
             if (ModelState.IsValid)
             {
+                var user = new IdentityUser();
+
                 _context.Add(parent);
                 await _context.SaveChangesAsync();
+                user.Email = parent.Email;
+                user.UserName = parent.Email;
+                await _userManager.CreateAsync(user, "Passw0rd!");
+                await _userManager.AddToRoleAsync(user, "Parent");
                 return RedirectToAction(nameof(Index));
             }
             return View(parent);

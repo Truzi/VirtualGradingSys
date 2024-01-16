@@ -11,7 +11,7 @@ using VirtualGradingSys.Models;
 
 namespace VirtualGradingSys.Controllers
 {
-    [Authorize(Roles = "Teacher")]
+    [Authorize]
     public class GradeController : Controller
     {
         private readonly ApplicationDbContext _context;
@@ -26,11 +26,9 @@ namespace VirtualGradingSys.Controllers
         {
             var gradingSystemContext = _context.Grades.Include(g => g.Student).Include(g => g.Subject);
             ViewData["Classes"] = _context.Students.Select(s => s.Class).Distinct().OrderBy(c => c.Year).ToList();
+            ViewData["Students"] = _context.Students.Include(s => s.Parent).ToList();
             var classes = _context.Students.Select(s => s.Class).Distinct().OrderBy(c => c.Year).ToList();
-            foreach (var c in classes)
-            {
-                Console.WriteLine(c.Id);
-            }
+
             return View(await gradingSystemContext.ToListAsync());
         }
 

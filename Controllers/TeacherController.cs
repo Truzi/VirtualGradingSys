@@ -2,9 +2,11 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.AspNetCore.Mvc.TagHelpers;
 using Microsoft.EntityFrameworkCore;
 using VirtualGradingSys.Data;
 using VirtualGradingSys.Models;
@@ -12,6 +14,7 @@ using static System.Formats.Asn1.AsnWriter;
 
 namespace VirtualGradingSys.Controllers
 {
+    [Authorize(Roles = "Admin")]
     public class TeacherController : Controller
     {
         private readonly ApplicationDbContext _context;
@@ -52,7 +55,7 @@ namespace VirtualGradingSys.Controllers
         // GET: Teacher/Create
         public IActionResult Create()
         {
-            ViewData["ClassId"] = new SelectList(_context.Classes, "Id", "Id");
+            ViewData["ClassId"] = new SelectList(_context.Classes, "Id", "ClassName");
             return View();
         }
 
@@ -65,12 +68,12 @@ namespace VirtualGradingSys.Controllers
         {
             if (ModelState.IsValid)
             {
+                var user = new IdentityUser();
+
                 _context.Add(teacher);
                 await _context.SaveChangesAsync();
-                var user = new IdentityUser();
-                var email = $"{teacher.FirstName.ToLower()}.{teacher.LastName.ToLower()}";
-                user.Email = $"{email}@email.com";
-                user.UserName = $"{email}@email.com";
+                user.Email = teacher.Email;
+                user.UserName = teacher.Email;
                 await _userManager.CreateAsync(user, "Passw0rd!");
                 await _userManager.AddToRoleAsync(user, "Teacher");
                 return RedirectToAction(nameof(Index));
