@@ -12,8 +12,8 @@ using VirtualGradingSys.Data;
 namespace VirtualGradingSys.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20240116093058_initial")]
-    partial class initial
+    [Migration("20240116174207_init")]
+    partial class init
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
