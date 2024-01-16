@@ -8,6 +8,28 @@
 
 @if (User.IsInRole("Teacher") || User.IsInRole("Admin"))
 {
+    <div class="row">
+        <div class="col-md-4">
+            <form asp-action="Index" method="get">
+                <div class="form-group">
+                    <label class="control-label">Start Date</label>
+                    <input type="date" name="startDate" class="form-control" />
+                </div>
+                <div class="form-group">
+                    <label class="control-label">End Date</label>
+                    <input type="date" name="endDate" class="form-control" />
+                </div>
+                <div class="form-group">
+                    <label class="control-label">Student</label>
+                    <select name="studentId" class="form-control" asp-items="ViewBag.StudentId"></select>
+                </div>
+                <div class="form-group">
+                    <input type="submit" value="Search" class="btn btn-primary" />
+                </div>
+            </form>
+        </div>
+    </div>
+
     @foreach (var c in ViewBag.Classes)
     {
         <h2>@c.ClassName</h2>
@@ -33,7 +55,7 @@
             <tbody>
                 @foreach (var item in Model)
                 {
-                    @if (item.Student.ClassId == c.Id)
+                    @if (item.Student != null && item.Student.ClassId == c.Id)
                     {
                         <tr>
                             <td>

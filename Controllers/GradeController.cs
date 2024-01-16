@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
+using SQLitePCL;
 using VirtualGradingSys.Data;
 using VirtualGradingSys.Models;
 
@@ -22,15 +23,78 @@ namespace VirtualGradingSys.Controllers
         }
 
         // GET: Grade
-        public async Task<IActionResult> Index()
+        //public async Task<IActionResult> Index()
+        //{
+        //    var gradingSystemContext = _context.Grades.Include(g => g.Student).Include(g => g.Subject);
+        //    ViewData["Classes"] = _context.Students.Select(s => s.Class).Distinct().OrderBy(c => c.Year).ToList();
+        //    ViewData["Students"] = _context.Students.Include(s => s.Parent).ToList();
+        //    var classes = _context.Students.Select(s => s.Class).Distinct().OrderBy(c => c.Year).ToList();
+
+        //    return View(await gradingSystemContext.ToListAsync());
+        //}
+
+        public async Task<IActionResult> Index(DateTime? startDate = null, DateTime? endDate = null, int? studentId = null)
         {
+            Console.WriteLine((startDate.ToString() != "" && endDate.ToString() != ""));
+            Console.WriteLine(studentId);
+            if (startDate.ToString() != "" && endDate.ToString() != "")
+            {
+                var sDate = DateOnly.FromDateTime(startDate.Value);
+                var eDate = DateOnly.FromDateTime(endDate.Value);
+
+                var filteredGrades = await _context.Grades
+                    .Where(g =>
+                        (!startDate.HasValue || g.Date >= sDate) &&
+                        (!endDate.HasValue || g.Date <= eDate)
+                    )
+                    .ToListAsync();
+
+                ViewBag.Classes = await _context.Classes.ToListAsync();
+
+                return View(filteredGrades);
+            } else if(studentId.HasValue)
+            {
+                var filteredGrades = await _context.Grades
+                    .Where(g =>
+                        (g.StudentId == studentId)
+                    )
+                    .ToListAsync();
+                ViewBag.Classes = await _context.Classes.ToListAsync();
+
+                return View(filteredGrades);
+            } else if(startDate.HasValue && endDate.HasValue && studentId.HasValue)
+            {
+                var sDate = DateOnly.FromDateTime(startDate.Value);
+                var eDate = DateOnly.FromDateTime(endDate.Value);
+
+                var filteredGrades = await _context.Grades
+                    .Where(g =>
+                        (!startDate.HasValue || g.Date >= sDate) &&
+                        (!endDate.HasValue || g.Date <= eDate) &&
+                        (!studentId.HasValue || g.StudentId == studentId)
+                    ).Include(g => g.Subject)
+                    .Include(g => g.Student)
+                    .ToListAsync();
+
+                ViewBag.Classes = await _context.Classes.ToListAsync();
+
+                return View(filteredGrades);
+            }
+
             var gradingSystemContext = _context.Grades.Include(g => g.Student).Include(g => g.Subject);
-            ViewData["Classes"] = _context.Students.Select(s => s.Class).Distinct().OrderBy(c => c.Year).ToList();
-            ViewData["Students"] = _context.Students.Include(s => s.Parent).ToList();
-            var classes = _context.Students.Select(s => s.Class).Distinct().OrderBy(c => c.Year).ToList();
+
+            ViewData["Classes"] = await _context.Students.Select(s => s.Class).Distinct().OrderBy(c => c.Year).ToListAsync();
+
+
+            var allStudents = await _context.Students.Include(s => s.Parent).ToListAsync();
+            ViewData["Students"] = allStudents;
+
+            var students = await _context.Students.ToListAsync();
+            ViewBag.StudentId = new SelectList(students, "Id", "FullName");
 
             return View(await gradingSystemContext.ToListAsync());
         }
+
 
         // GET: Grade/Details/5
         public async Task<IActionResult> Details(int? id)
