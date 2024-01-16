@@ -1,46 +1,48 @@
 ﻿@model IEnumerable<VirtualGradingSys.Models.Grade>
 
 @{
-    ViewData["Title"] = "Index";
+    ViewData["Title"] = "Grades";
 }
 
-<h1>Index</h1>
+<h1>Grades</h1>
 
-<p>
-    <a asp-action="Create">Create New</a>
-</p>
-<table class="table">
-    <thead>
-        <tr>
-            <th>
-                @Html.DisplayNameFor(model => model.Value)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Type)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Student)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Subject)
-            </th>
-            <th></th>
-        </tr>
-    </thead>
-    <tbody>
+@foreach(var c in ViewBag.Classes) {
+    <h2>@c.ClassName</h2>
+    <a asp-action="Create" asp-route-classId=@c.Id>Add Grade</a>
+    <table class="table">
+        <thead>
+            <tr>
+                <th>
+                    @Html.DisplayNameFor(model => model.Subject)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.Student)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.Type)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.Value)
+                </th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
 @foreach (var item in Model) {
+    @if (item.Student.ClassId == c.Id)
+    {
         <tr>
             <td>
-                @Html.DisplayFor(modelItem => item.Value)
+                @Html.DisplayFor(modelItem => item.Subject.Name)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Student.FullName)
             </td>
             <td>
                 @Html.DisplayFor(modelItem => item.Type)
             </td>
             <td>
-                @Html.DisplayFor(modelItem => item.Student.Id)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Subject.Id)
+                @Html.DisplayFor(modelItem => item.Value)
             </td>
             <td>
                 <a asp-action="Edit" asp-route-id="@item.Id">Edit</a> |
@@ -48,6 +50,8 @@
                 <a asp-action="Delete" asp-route-id="@item.Id">Delete</a>
             </td>
         </tr>
-}
+        }
+    }
     </tbody>
 </table>
+}

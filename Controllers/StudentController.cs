@@ -23,8 +23,7 @@ namespace VirtualGradingSys.Controllers
         public async Task<IActionResult> Index()
         {
             var gradingSystemContext = _context.Students.Include(s => s.Class).Include(s => s.Parent);
-            var classes = _context.Students.Select(s => s.Class).Distinct().OrderBy(c => c.Year).ToList();
-            ViewBag.Classes = classes;
+            ViewData["Classes"] = _context.Students.Select(s => s.Class).Distinct().OrderBy(c => c.Year).ToList();
             return View(await gradingSystemContext.ToListAsync());
         }
 

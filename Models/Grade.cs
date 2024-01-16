@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations.Schema;
+﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace VirtualGradingSys.Models
 {
@@ -6,8 +7,11 @@ namespace VirtualGradingSys.Models
     {
         // fields
         public int Id { get; set; }
+        [Range(1, 6, ErrorMessage = "Value must be between 1 and 6")]
         public int Value { get; set; }
-        public string Type { get; set; } // add logic to controller to check for one of those: test, quiz, activity
+        [RegularExpression("^(Exam|Quiz|Activity)$", ErrorMessage = "Invalid value. Allowed values are 'exam', 'quiz', or 'activity'.")]
+        public string Type { get; set; }
+        public DateOnly Date { get; set; }
         [ForeignKey("Student")]
         public int StudentId { get; set; }
         [ForeignKey("Subject")]

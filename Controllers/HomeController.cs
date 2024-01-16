@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using System.Diagnostics;
 using VirtualGradingSys.Models;
@@ -15,6 +16,7 @@ namespace VirtualGradingSys.Controllers
 
         public IActionResult Index()
         {
+            
             return View();
         }
 

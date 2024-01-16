@@ -2,21 +2,25 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using VirtualGradingSys.Data;
 using VirtualGradingSys.Models;
+using static System.Formats.Asn1.AsnWriter;
 
 namespace VirtualGradingSys.Controllers
 {
     public class TeacherController : Controller
     {
         private readonly ApplicationDbContext _context;
+        private readonly UserManager<IdentityUser> _userManager;
 
-        public TeacherController(ApplicationDbContext context)
+        public TeacherController(ApplicationDbContext context, UserManager<IdentityUser> userManager)
         {
             _context = context;
+            _userManager = userManager;
         }
 
         // GET: Teacher
@@ -63,6 +67,12 @@ namespace VirtualGradingSys.Controllers
             {
                 _context.Add(teacher);
                 await _context.SaveChangesAsync();
+                var user = new IdentityUser();
+                var email = $"{teacher.FirstName.ToLower()}.{teacher.LastName.ToLower()}";
+                user.Email = $"{email}@email.com";
+                user.UserName = $"{email}@email.com";
+                await _userManager.CreateAsync(user, "Passw0rd!");
+                await _userManager.AddToRoleAsync(user, "Teacher");
                 return RedirectToAction(nameof(Index));
             }
             return View(teacher);
