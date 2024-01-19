@@ -24,8 +24,7 @@ namespace VirtualGradingSys.Data
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<IdentityRole>().HasData(
-                new IdentityRole { Id = "1", Name = "Admin", NormalizedName = "ADMIN" },
-                new IdentityRole { Id = "2", Name = "User", NormalizedName = "USER" }
+                new IdentityRole { Id = "1", Name = "Admin", NormalizedName = "ADMIN" }
             );
             
 

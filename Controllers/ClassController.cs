@@ -35,7 +35,7 @@ namespace VirtualGradingSys.Controllers
                 return NotFound();
             }
 
-            var @class = await _context.Classes
+            var @class = await _context.Classes.Include(c => c.Teacher)
                 .FirstOrDefaultAsync(m => m.Id == id);
             if (@class == null)
             {
