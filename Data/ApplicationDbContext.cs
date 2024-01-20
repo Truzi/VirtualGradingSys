@@ -32,15 +32,13 @@ namespace VirtualGradingSys.Data
                 .HasOne(cs => cs.Subject)
                 .WithMany(s => s.ClassSubjects)
                 .HasForeignKey(cs => cs.SubjectId)
-                .OnDelete(DeleteBehavior.Restrict); // NO ACTION behavior
+                .OnDelete(DeleteBehavior.Restrict);
 
             modelBuilder.Entity<Grade>()
                 .HasOne(g => g.Subject)
                 .WithMany(s => s.Grades)
                 .HasForeignKey(g => g.SubjectId)
                 .OnDelete(DeleteBehavior.Restrict);
-
-            // Add other entity configurations as needed
 
             base.OnModelCreating(modelBuilder);
         }
